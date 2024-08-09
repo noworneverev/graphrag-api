@@ -1,0 +1,4 @@
+graphrag
+fastapi
+uvicorn
+pydantic-settings
