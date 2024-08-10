@@ -1,6 +1,18 @@
+import json
 from typing import Union, List, Dict, Any
 import pandas as pd
 from graphrag.query.structured_search.base import SearchResult
+
+def convert_response_to_string(response: Union[str, Dict[str, Any], List[Dict[str, Any]]]) -> str:
+    """
+    Convert a response that can be a string, dictionary, or list of dictionaries to a string.
+    """
+    if isinstance(response, (dict, list)):
+        return json.dumps(response)
+    elif isinstance(response, str):
+        return response
+    else:
+        return str(response)
 
 def process_context_data(context_data: Union[str, List[pd.DataFrame], Dict[str, pd.DataFrame]]):
     if isinstance(context_data, str):        

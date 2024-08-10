@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import tiktoken
 
@@ -25,7 +26,7 @@ from graphrag.query.input.loaders.dfs import (
 from graphrag.query.llm.oai.embedding import OpenAIEmbedding
 from dotenv import load_dotenv
 
-from utils import process_context_data, serialize_search_result
+from utils import convert_response_to_string, process_context_data, serialize_search_result
 from settings import load_settings_from_yaml
 
 from constants import (
@@ -42,6 +43,15 @@ _ = load_dotenv()
 settings = load_settings_from_yaml("settings.yml")
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "https://noworneverev.github.io"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Load environment variables
 api_key = settings.GRAPHRAG_API_KEY
@@ -182,7 +192,7 @@ async def global_search(query: str = Query(..., description="Search query for gl
     try:
         result = await global_search_engine.asearch(query)        
         response_dict = {
-            "response": result.response,
+            "response": convert_response_to_string(result.response),
             "context_data": process_context_data(result.context_data),
             "context_text": result.context_text,
             "completion_time": result.completion_time,
@@ -201,7 +211,7 @@ async def local_search(query: str = Query(..., description="Search query for loc
     try:
         result = await local_search_engine.asearch(query)        
         response_dict = {
-            "response": result.response,
+            "response": convert_response_to_string(result.response),
             "context_data": process_context_data(result.context_data),
             "context_text": result.context_text,
             "completion_time": result.completion_time,
