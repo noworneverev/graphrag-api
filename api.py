@@ -222,6 +222,10 @@ async def local_search(query: str = Query(..., description="Search query for loc
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/status")
+async def status():
+    return JSONResponse(content={"status": "Server is up and running"})
+
 
 if __name__ == "__main__":
     import uvicorn

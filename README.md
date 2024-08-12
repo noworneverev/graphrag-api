@@ -33,6 +33,11 @@ python api.py
 
 Open http://127.0.0.1:8000/docs/ to see the API documentation.
 
+You can also use the interface at [GraphRAG Visualizer](https://noworneverev.github.io/graphrag-visualizer/) to run queries against the server.
+
+![search](static/image.png)
+
 ## API Endpoints
 - `/search/global`: Perform a global search using GraphRAG.
 - `/search/local`: Perform a local search using GraphRAG.
+- `/status`: Check if the server is up and running.
