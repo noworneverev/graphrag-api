@@ -55,14 +55,19 @@ app.add_middleware(
 
 # Load environment variables
 api_key = settings.GRAPHRAG_API_KEY
+api_base = settings.GRAPHRAG_API_BASE
+openai_api_version = settings.GRAPHRAG_OPENAI_API_VERSION
 llm_model = settings.GRAPHRAG_LLM_MODEL
 embedding_model = settings.GRAPHRAG_EMBEDDING_MODEL
 claim_extraction_enabled = settings.GRAPHRAG_CLAIM_EXTRACTION_ENABLED
 
 llm = ChatOpenAI(
     api_key=api_key,
+    api_base=api_base,
+    api_version=openai_api_version,
+    deployment_name="gpt-4o",
     model=llm_model,
-    api_type=OpenaiApiType.OpenAI,
+    api_type=OpenaiApiType.AzureOpenAI,
     max_retries=20,
 )
 

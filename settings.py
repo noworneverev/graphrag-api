@@ -2,6 +2,8 @@ from pydantic_settings import BaseSettings
 import yaml
 
 class Settings(BaseSettings):
+    GRAPHRAG_OPENAI_API_VERSION: str
+    GRAPHRAG_API_BASE: str
     GRAPHRAG_LLM_MODEL: str
     GRAPHRAG_EMBEDDING_MODEL: str
     GRAPHRAG_CLAIM_EXTRACTION_ENABLED: bool
