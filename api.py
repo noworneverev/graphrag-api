@@ -55,14 +55,17 @@ app.add_middleware(
 
 # Load environment variables
 api_key = settings.GRAPHRAG_API_KEY
+llm_api_base = settings.GRAPHRAG_LLM_API_BASE
+embedding_api_base = settings.GRAPHRAG_EMBEDDING_API_BASE
 llm_model = settings.GRAPHRAG_LLM_MODEL
 embedding_model = settings.GRAPHRAG_EMBEDDING_MODEL
 claim_extraction_enabled = settings.GRAPHRAG_CLAIM_EXTRACTION_ENABLED
 
 llm = ChatOpenAI(
-    api_key=api_key,
-    model=llm_model,
-    api_type=OpenaiApiType.OpenAI,
+    model = llm_model,
+    api_key = api_key,
+    api_type = OpenaiApiType.OpenAI,
+    api_base = llm_api_base,
     max_retries=20,
 )
 
@@ -149,7 +152,7 @@ def setup_local_search():
         embedding_vectorstore_key=EntityVectorStoreKey.ID,
         text_embedder=OpenAIEmbedding(
             api_key=api_key,
-            api_base=None,
+            api_base=embedding_api_base,
             api_type=OpenaiApiType.OpenAI,
             model=embedding_model,
             deployment_name=embedding_model,
