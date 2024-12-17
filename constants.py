@@ -1,3 +1,4 @@
+COMMUNITY_TABLE = "create_final_communities"
 COMMUNITY_REPORT_TABLE = "create_final_community_reports"
 ENTITY_TABLE = "create_final_nodes"
 ENTITY_EMBEDDING_TABLE = "create_final_entities"

@@ -164,3 +164,4 @@ cython_debug/
 artifacts/*.parquet
 artifacts/*.json
 artifacts/lancedb
+artifacts/bak

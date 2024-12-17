@@ -2,6 +2,26 @@ import json
 from typing import Union, List, Dict, Any
 import pandas as pd
 from graphrag.query.structured_search.base import SearchResult
+from constants import (
+    COMMUNITY_REPORT_TABLE,
+    ENTITY_TABLE,
+    ENTITY_EMBEDDING_TABLE,
+    RELATIONSHIP_TABLE,
+    COVARIATE_TABLE,
+    TEXT_UNIT_TABLE,
+    COMMUNITY_TABLE
+)
+
+def load_parquet_files(input_dir: str, claim_extraction_enabled: bool):
+    entity_df = pd.read_parquet(f"{input_dir}/{ENTITY_TABLE}.parquet")
+    entity_embedding_df = pd.read_parquet(f"{input_dir}/{ENTITY_EMBEDDING_TABLE}.parquet")
+    report_df = pd.read_parquet(f"{input_dir}/{COMMUNITY_REPORT_TABLE}.parquet")
+    relationship_df = pd.read_parquet(f"{input_dir}/{RELATIONSHIP_TABLE}.parquet")    
+    covariate_df = pd.read_parquet(f"{input_dir}/{COVARIATE_TABLE}.parquet") if claim_extraction_enabled else pd.DataFrame()
+    text_unit_df = pd.read_parquet(f"{input_dir}/{TEXT_UNIT_TABLE}.parquet")
+    community_df = pd.read_parquet(f"{input_dir}/{COMMUNITY_TABLE}.parquet")
+
+    return entity_df, entity_embedding_df, report_df, relationship_df, covariate_df, text_unit_df, community_df
 
 def convert_response_to_string(response: Union[str, Dict[str, Any], List[Dict[str, Any]]]) -> str:
     """
