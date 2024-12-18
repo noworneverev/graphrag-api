@@ -18,17 +18,18 @@ def setup_llm_and_embedder(settings: Settings):
     common_params = {
         "max_retries": 20,
     }
-
+        
     if settings.GRAPHRAG_LLM_TYPE == "openai_chat":
         llm = ChatOpenAI(
             api_key=settings.OPENAI_API_KEY,
+            api_base=settings.GRAPHRAG_LLM_API_BASE,
             model=settings.GRAPHRAG_LLM_MODEL,
             api_type=OpenaiApiType.OpenAI,
             **common_params,
         )
         text_embedder = OpenAIEmbedding(
             api_key=settings.OPENAI_API_KEY,
-            api_base=None,
+            api_base=settings.GRAPHRAG_EMBEDDING_API_BASE,
             api_type=OpenaiApiType.OpenAI,
             model=settings.GRAPHRAG_EMBEDDING_MODEL,
             deployment_name=settings.GRAPHRAG_EMBEDDING_MODEL,
@@ -39,7 +40,7 @@ def setup_llm_and_embedder(settings: Settings):
             api_base=settings.AZURE_ENDPOINT,
             api_key=settings.AZURE_OPENAI_API_KEY,
             api_version=settings.AZURE_API_VERSION,
-            deployment_name=settings.AZURE_DEPLOYMENT,
+            deployment_name=settings.AZURE_LLM_DEPLOYMENT,
             api_type=OpenaiApiType.AzureOpenAI,
             **common_params,
         )
