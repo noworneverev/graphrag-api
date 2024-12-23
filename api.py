@@ -166,7 +166,7 @@ local_search_engine = setup_local_search()
 drift_search_engine = setup_drift_search()
 
 @app.get("/search/drift")
-async def local_search(query: str = Query(..., description="DRIFT search query")):
+async def drift_search(query: str = Query(..., description="DRIFT search query")):
     try:
         result = await drift_search_engine.asearch(query)        
         response_dict = {

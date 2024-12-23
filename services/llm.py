@@ -35,12 +35,13 @@ def setup_llm_and_embedder(settings: Settings):
             deployment_name=settings.GRAPHRAG_EMBEDDING_MODEL,
             **common_params,
         )
-    else:
+    else:        
         llm = ChatOpenAI(
             api_base=settings.AZURE_ENDPOINT,
             api_key=settings.AZURE_OPENAI_API_KEY,
             api_version=settings.AZURE_API_VERSION,
             deployment_name=settings.AZURE_LLM_DEPLOYMENT,
+            model=settings.GRAPHRAG_LLM_MODEL,
             api_type=OpenaiApiType.AzureOpenAI,
             **common_params,
         )
@@ -49,6 +50,7 @@ def setup_llm_and_embedder(settings: Settings):
             api_key=settings.AZURE_OPENAI_API_KEY,
             api_type=OpenaiApiType.AzureOpenAI,
             api_version=settings.AZURE_API_VERSION,
+            model=settings.GRAPHRAG_EMBEDDING_MODEL,
             deployment_name=settings.AZURE_EMBEDDINGS_DEPLOYMENT,
             **common_params,
         )
