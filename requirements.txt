@@ -1,4 +1,4 @@
-graphrag
-fastapi
-uvicorn
-pydantic-settings
+graphrag~=1.0.0
+fastapi~=0.112.0
+uvicorn~=0.30.5
+pydantic-settings~=2.4.0
