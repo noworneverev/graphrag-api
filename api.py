@@ -77,7 +77,8 @@ def setup_drift_search() -> DRIFTSearch:
         COMMUNITY_LEVEL,
         content_embedding_col="full_content_embeddings",
     )
-    read_indexer_report_embeddings(drift_reports, full_content_embedding_store)
+
+    read_indexer_report_embeddings(drift_reports, full_content_embedding_store)    
 
     drift_params = DRIFTSearchConfig(
         temperature=0,
@@ -194,14 +195,18 @@ drift_search_engine = setup_drift_search()
 @app.get("/search/drift")
 async def drift_search(query: str = Query(..., description="DRIFT search query")):
     try:
-        result = await drift_search_engine.asearch(query)        
+        result = await drift_search_engine.asearch(query)
         response_dict = {
-            "response": convert_response_to_string(result.response),
+            "response": convert_response_to_string(result.response["nodes"][0]["answer"]),
             "context_data": process_context_data(result.context_data),
             "context_text": result.context_text,
             "completion_time": result.completion_time,
             "llm_calls": result.llm_calls,
+            "llm_calls_categories": result.llm_calls_categories,
+            "output_tokens":result.output_tokens,
+            "output_tokens_categories":result.output_tokens_categories,
             "prompt_tokens": result.prompt_tokens,            
+            "prompt_tokens_categories": result.prompt_tokens_categories        
         }
         return JSONResponse(content=response_dict)
     except Exception as e:
@@ -215,12 +220,16 @@ async def global_search(query: str = Query(..., description="Search query for gl
             "response": convert_response_to_string(result.response),
             "context_data": process_context_data(result.context_data),
             "context_text": result.context_text,
-            "completion_time": result.completion_time,
-            "llm_calls": result.llm_calls,
-            "prompt_tokens": result.prompt_tokens,
             "reduce_context_data": process_context_data(result.reduce_context_data),
             "reduce_context_text": result.reduce_context_text,
             "map_responses": [serialize_search_result(result) for result in result.map_responses],
+            "completion_time": result.completion_time,
+            "llm_calls": result.llm_calls,
+            "llm_calls_categories": result.llm_calls_categories,
+            "output_tokens":result.output_tokens,
+            "output_tokens_categories":result.output_tokens_categories,
+            "prompt_tokens": result.prompt_tokens,
+            "prompt_tokens_categories": result.prompt_tokens_categories,
         }
         return JSONResponse(content=response_dict)
     except Exception as e:
@@ -236,7 +245,11 @@ async def local_search(query: str = Query(..., description="Search query for loc
             "context_text": result.context_text,
             "completion_time": result.completion_time,
             "llm_calls": result.llm_calls,
-            "prompt_tokens": result.prompt_tokens,            
+            "llm_calls_categories": result.llm_calls_categories,
+            "output_tokens":result.output_tokens,
+            "output_tokens_categories":result.output_tokens_categories,
+            "prompt_tokens": result.prompt_tokens,
+            "prompt_tokens_categories": result.prompt_tokens_categories
         }
         return JSONResponse(content=response_dict)
     except Exception as e:
