@@ -34,16 +34,24 @@ def convert_response_to_string(response: Union[str, Dict[str, Any], List[Dict[st
     else:
         return str(response)
 
-def process_context_data(context_data: Union[str, List[pd.DataFrame], Dict[str, pd.DataFrame]]):
-    if isinstance(context_data, str):        
+def recursively_convert(obj: Any) -> Any:
+    if isinstance(obj, pd.DataFrame):
+        return obj.to_dict(orient="records")
+    elif isinstance(obj, list):
+        return [recursively_convert(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: recursively_convert(value) for key, value in obj.items()}
+    return obj
+
+def process_context_data(context_data: Union[str, List[pd.DataFrame], Dict, pd.DataFrame]) -> Any:
+    if isinstance(context_data, str):
         return context_data
-    elif isinstance(context_data, list):        
-        return [df.to_dict(orient="records") for df in context_data]
-    elif isinstance(context_data, dict):        
-        return {key: df.to_dict(orient="records") for key, df in context_data.items()}
-    else:        
-        return None
-    
+    if isinstance(context_data, pd.DataFrame):
+        return context_data.to_dict(orient="records")
+    if isinstance(context_data, (list, dict)):
+        return recursively_convert(context_data)
+    return None
+
 def serialize_search_result(search_result: SearchResult) -> Dict[str, Any]:
     return {
         "response": search_result.response,

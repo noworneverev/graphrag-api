@@ -14,10 +14,12 @@ from graphrag.query.structured_search.local_search.mixed_context import LocalSea
 from graphrag.query.structured_search.drift_search.drift_context import DRIFTSearchContextBuilder
 from graphrag.query.context_builder.entity_extraction import EntityVectorStoreKey
 from graphrag.vector_stores.lancedb import LanceDBVectorStore
+from graphrag.config.models.drift_search_config import DRIFTSearchConfig
 from graphrag.query.indexer_adapters import (
     read_indexer_covariates,
     read_indexer_entities,
     read_indexer_relationships,
+    read_indexer_report_embeddings,
     read_indexer_reports,
     read_indexer_text_units,
     read_indexer_communities
@@ -63,15 +65,40 @@ description_embedding_store = LanceDBVectorStore(
 )
 description_embedding_store.connect(db_uri=LANCEDB_URI)
 
+full_content_embedding_store = LanceDBVectorStore(
+    collection_name="default-community-full_content",
+)
+full_content_embedding_store.connect(db_uri=LANCEDB_URI)
+
 def setup_drift_search() -> DRIFTSearch:
+    drift_reports = read_indexer_reports(
+        report_df,
+        entity_df,
+        COMMUNITY_LEVEL,
+        content_embedding_col="full_content_embeddings",
+    )
+
+    read_indexer_report_embeddings(drift_reports, full_content_embedding_store)    
+
+    drift_params = DRIFTSearchConfig(
+        temperature=0,
+        max_tokens=12_000,
+        primer_folds=1,
+        drift_k_followups=3,
+        n_depth=3,
+        n=1,
+    )
+
     context_builder = DRIFTSearchContextBuilder(
         chat_llm=llm,
         text_embedder=text_embedder,
         entities=entities,
         relationships=relationships,
-        reports=reports,
+        reports=drift_reports,
         entity_text_embeddings=description_embedding_store,
         text_units=text_units,
+        token_encoder=token_encoder,
+        config=drift_params
     )
 
     return DRIFTSearch(
@@ -168,14 +195,18 @@ drift_search_engine = setup_drift_search()
 @app.get("/search/drift")
 async def drift_search(query: str = Query(..., description="DRIFT search query")):
     try:
-        result = await drift_search_engine.asearch(query)        
+        result = await drift_search_engine.asearch(query)
         response_dict = {
-            "response": convert_response_to_string(result.response),
+            "response": convert_response_to_string(result.response["nodes"][0]["answer"]),
             "context_data": process_context_data(result.context_data),
             "context_text": result.context_text,
             "completion_time": result.completion_time,
             "llm_calls": result.llm_calls,
+            "llm_calls_categories": result.llm_calls_categories,
+            "output_tokens":result.output_tokens,
+            "output_tokens_categories":result.output_tokens_categories,
             "prompt_tokens": result.prompt_tokens,            
+            "prompt_tokens_categories": result.prompt_tokens_categories        
         }
         return JSONResponse(content=response_dict)
     except Exception as e:
@@ -189,12 +220,16 @@ async def global_search(query: str = Query(..., description="Search query for gl
             "response": convert_response_to_string(result.response),
             "context_data": process_context_data(result.context_data),
             "context_text": result.context_text,
-            "completion_time": result.completion_time,
-            "llm_calls": result.llm_calls,
-            "prompt_tokens": result.prompt_tokens,
             "reduce_context_data": process_context_data(result.reduce_context_data),
             "reduce_context_text": result.reduce_context_text,
             "map_responses": [serialize_search_result(result) for result in result.map_responses],
+            "completion_time": result.completion_time,
+            "llm_calls": result.llm_calls,
+            "llm_calls_categories": result.llm_calls_categories,
+            "output_tokens":result.output_tokens,
+            "output_tokens_categories":result.output_tokens_categories,
+            "prompt_tokens": result.prompt_tokens,
+            "prompt_tokens_categories": result.prompt_tokens_categories,
         }
         return JSONResponse(content=response_dict)
     except Exception as e:
@@ -210,7 +245,11 @@ async def local_search(query: str = Query(..., description="Search query for loc
             "context_text": result.context_text,
             "completion_time": result.completion_time,
             "llm_calls": result.llm_calls,
-            "prompt_tokens": result.prompt_tokens,            
+            "llm_calls_categories": result.llm_calls_categories,
+            "output_tokens":result.output_tokens,
+            "output_tokens_categories":result.output_tokens_categories,
+            "prompt_tokens": result.prompt_tokens,
+            "prompt_tokens_categories": result.prompt_tokens_categories
         }
         return JSONResponse(content=response_dict)
     except Exception as e:
