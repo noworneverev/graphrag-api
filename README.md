@@ -27,9 +27,22 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-```
-python api.py
-```
+
+1. Copy the following files and the `lancedb` folder into the `artifacts` folder:
+    ```
+    lancedb
+    create_final_communities.parquet
+    create_final_community_reports.parquet
+    create_final_nodes.parquet
+    create_final_entities.parquet
+    create_final_relationships.parquet
+    create_final_covariates.parquet
+    create_final_text_units.parquet
+    ```
+2. Run the API
+    ```
+    python api.py
+    ```
 
 Open http://127.0.0.1:8000/docs/ to see the API documentation.
 
@@ -40,4 +53,5 @@ You can also use the interface at [GraphRAG Visualizer](https://noworneverev.git
 ## API Endpoints
 - `/search/global`: Perform a global search using GraphRAG.
 - `/search/local`: Perform a local search using GraphRAG.
+- `/search/drift`: Perform a DRIFT search using GraphRAG.
 - `/status`: Check if the server is up and running.

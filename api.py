@@ -14,10 +14,12 @@ from graphrag.query.structured_search.local_search.mixed_context import LocalSea
 from graphrag.query.structured_search.drift_search.drift_context import DRIFTSearchContextBuilder
 from graphrag.query.context_builder.entity_extraction import EntityVectorStoreKey
 from graphrag.vector_stores.lancedb import LanceDBVectorStore
+from graphrag.config.models.drift_search_config import DRIFTSearchConfig
 from graphrag.query.indexer_adapters import (
     read_indexer_covariates,
     read_indexer_entities,
     read_indexer_relationships,
+    read_indexer_report_embeddings,
     read_indexer_reports,
     read_indexer_text_units,
     read_indexer_communities
@@ -63,15 +65,39 @@ description_embedding_store = LanceDBVectorStore(
 )
 description_embedding_store.connect(db_uri=LANCEDB_URI)
 
+full_content_embedding_store = LanceDBVectorStore(
+    collection_name="default-community-full_content",
+)
+full_content_embedding_store.connect(db_uri=LANCEDB_URI)
+
 def setup_drift_search() -> DRIFTSearch:
+    drift_reports = read_indexer_reports(
+        report_df,
+        entity_df,
+        COMMUNITY_LEVEL,
+        content_embedding_col="full_content_embeddings",
+    )
+    read_indexer_report_embeddings(drift_reports, full_content_embedding_store)
+
+    drift_params = DRIFTSearchConfig(
+        temperature=0,
+        max_tokens=12_000,
+        primer_folds=1,
+        drift_k_followups=3,
+        n_depth=3,
+        n=1,
+    )
+
     context_builder = DRIFTSearchContextBuilder(
         chat_llm=llm,
         text_embedder=text_embedder,
         entities=entities,
         relationships=relationships,
-        reports=reports,
+        reports=drift_reports,
         entity_text_embeddings=description_embedding_store,
         text_units=text_units,
+        token_encoder=token_encoder,
+        config=drift_params
     )
 
     return DRIFTSearch(
