@@ -115,5 +115,9 @@ async def basic_search(query: str = Query(..., description="Basic Search")):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/status")
+async def status():
+    return JSONResponse(content={"status": "Server is up and running"})
+
 if __name__ == "__main__":    
     uvicorn.run(app, host="0.0.0.0", port=8000)
