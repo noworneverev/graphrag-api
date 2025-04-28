@@ -1,8 +1,7 @@
-# GraphRAG API
+# GraphRAG API [![GraphRAG v2.2.0](https://img.shields.io/badge/GraphRAG-v2.2.0-blue?style=flat-square)](https://pypi.org/project/graphrag/2.2.0/)
 
-This project provides a FastAPI-based server implementation for handling both global and local structured searches using GraphRAG.
-
-
+A FastAPI-based server that provides Global, Local, DRIFT, and Basic search capabilities based on [Microsoft GraphRAG](https://github.com/microsoft/graphrag).
+Designed for easy integration with the [GraphRAG Visualizer](https://noworneverev.github.io/graphrag-visualizer/) or custom clients.
 
 ## Installation
 
@@ -28,21 +27,18 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. Copy the following files and the `lancedb` folder into the `artifacts` folder:
-    ```
-    lancedb
-    create_final_communities.parquet
-    create_final_community_reports.parquet
-    create_final_nodes.parquet
-    create_final_entities.parquet
-    create_final_relationships.parquet
-    create_final_covariates.parquet
-    create_final_text_units.parquet
-    ```
-2. Run the API
-    ```
-    python api.py
-    ```
+1. Copy the entire GraphRAG project directory (e.g., `ragtest/`) into the root of this repository. This folder must contain at least: `output`, `prompts`, `settings.yaml` and `.env`.
+2. In `config.py`, point `PROJECT_DIRECTORY` at that folder, and adjust any other options as needed:
+   ```python
+   PROJECT_DIRECTORY = "ragtest"     # ← name of the folder you just copied
+   COMMUNITY_LEVEL = 2
+   CLAIM_EXTRACTION_ENABLED = False
+   RESPONSE_TYPE = "Single Paragraph"
+   ```
+3. Run the API
+   ```
+   python api.py
+   ```
 
 Open http://127.0.0.1:8000/docs/ to see the API documentation.
 
@@ -51,7 +47,8 @@ You can also use the interface at [GraphRAG Visualizer](https://noworneverev.git
 ![search](static/image.png)
 
 ## API Endpoints
+
 - `/search/global`: Perform a global search using GraphRAG.
 - `/search/local`: Perform a local search using GraphRAG.
 - `/search/drift`: Perform a DRIFT search using GraphRAG.
-- `/status`: Check if the server is up and running.
+- `/search/basic`: Perform a basic search using text units.
