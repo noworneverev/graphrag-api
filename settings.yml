@@ -1,9 +1,0 @@
-GRAPHRAG_LLM_TYPE: azure_openai_chat # openai_chat or azure_openai_chat
-GRAPHRAG_LLM_MODEL: gpt-4o
-GRAPHRAG_LLM_API_BASE: null
-GRAPHRAG_EMBEDDING_MODEL: text-embedding-3-small
-GRAPHRAG_EMBEDDING_API_BASE: null
-GRAPHRAG_CLAIM_EXTRACTION_ENABLED: False
-INPUT_DIR: "./artifacts"
-COMMUNITY_LEVEL: 2
-RESPONSE_TYPE: "single paragraph" # free form text describing the response type and format, can be anything, e.g. prioritized list, single paragraph, multiple paragraphs, multiple-page report
