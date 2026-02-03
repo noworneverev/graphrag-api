@@ -14,13 +14,16 @@ from config import PROJECT_DIRECTORY, COMMUNITY_LEVEL, CLAIM_EXTRACTION_ENABLED,
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.config = load_config(Path(PROJECT_DIRECTORY))
-    app.state.entities = pd.read_parquet(f"{PROJECT_DIRECTORY}/output/entities.parquet")
-    app.state.communities = pd.read_parquet(f"{PROJECT_DIRECTORY}/output/communities.parquet")
-    app.state.community_reports = pd.read_parquet(f"{PROJECT_DIRECTORY}/output/community_reports.parquet")
-    app.state.text_units = pd.read_parquet(f"{PROJECT_DIRECTORY}/output/text_units.parquet")
-    app.state.relationships = pd.read_parquet(f"{PROJECT_DIRECTORY}/output/relationships.parquet")
-    app.state.covariates = pd.read_parquet(f"{PROJECT_DIRECTORY}/output/covariates.parquet") if CLAIM_EXTRACTION_ENABLED else None
+    import config
+    project_path = Path(config.__file__).parent / PROJECT_DIRECTORY
+    output_path = project_path / "output"
+    app.state.config = load_config(project_path)
+    app.state.entities = pd.read_parquet(output_path / "entities.parquet")
+    app.state.communities = pd.read_parquet(output_path / "communities.parquet")
+    app.state.community_reports = pd.read_parquet(output_path / "community_reports.parquet")
+    app.state.text_units = pd.read_parquet(output_path / "text_units.parquet")
+    app.state.relationships = pd.read_parquet(output_path / "relationships.parquet")
+    app.state.covariates = pd.read_parquet(output_path / "covariates.parquet") if CLAIM_EXTRACTION_ENABLED else None
     yield
 
 app = FastAPI(lifespan=lifespan)
